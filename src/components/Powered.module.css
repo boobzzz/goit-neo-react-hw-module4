@@ -1,0 +1,21 @@
+.container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 16px;
+    color: #747bff;
+}
+
+.container span,
+.container svg {
+    margin-right: 10px;
+}
+
+.container a {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-weight: 900;
+    font-size: 16px;
+    color: #000;
+}

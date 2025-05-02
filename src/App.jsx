@@ -1,35 +1,83 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
-import './App.css'
+import { fetchImages } from './services/api.js';
+import { autoScrollOnLoadMore } from './utils/utils.js';
+import { useState, useEffect } from 'react';
+import toast, { Toaster } from 'react-hot-toast';
+
+import SearchBox from './components/SearchBox.jsx';
+import ImageGallery from './components/ImageGallery.jsx';
+import LoadMoreBtn from './components/LoadMoreBtn.jsx';
+import Loader from './components/Loader.jsx';
+import ErrorMessage from './components/ErrorMessage.jsx';
+import Powered from './components/Powered.jsx';
+import './App.css';
 
 function App() {
-  const [count, setCount] = useState(0)
+    const [images, setImages] = useState([]);
+    const [query, setQuery] = useState('');
+    const [page, setPage] = useState(0);
+    const [loading, setLoading] = useState(false);
+    const [error, setError] = useState('');
 
-  return (
-    <>
-      <div>
-        <a href="https://vite.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
-      </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.jsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
-    </>
-  )
+    async function getImages(query, page) {
+        try {
+            setLoading(true);
+            return await fetchImages(query, page);
+        } catch (err) {
+            setError(err.message);
+        } finally {
+            setLoading(false);
+        }
+    }
+
+    const searchImages = async (newQuery) => {
+        if (!newQuery || newQuery === query) {
+            toast('Search query is empty or the same as before.');
+            return;
+        }
+
+        const firstPage = 1;
+        const newImages = await getImages(newQuery, firstPage);
+
+        setImages(newImages);
+        setQuery(newQuery);
+        setPage(firstPage);
+        setError('');
+    }
+
+    const loadMore = async () => {
+        const nextPage = page + 1;
+        const newImages = await getImages(query, nextPage);
+
+        if (newImages?.length > 0) {
+            setImages([...images, ...newImages]);
+            setPage(nextPage);
+            setError('');
+        }
+    }
+
+    useEffect(() => {
+        if (page > 1) {
+            autoScrollOnLoadMore();
+        }
+    }, [page]);
+
+    return (
+        <>
+            <header>
+                <SearchBox onSubmit={searchImages} />
+            </header>
+            <main>
+                {images?.length > 0 && <ImageGallery images={images} />}
+                {loading && <Loader />}
+                {error && <ErrorMessage message={error} />}
+                {images?.length > 0 && <LoadMoreBtn onClick={loadMore} />}
+            </main>
+            <footer>
+                <Powered />
+            </footer>
+            <Toaster/>
+        </>
+    )
 }
 
-export default App
+export default App;
