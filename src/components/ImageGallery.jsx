@@ -2,16 +2,17 @@ import ImageCard from './ImageCard.jsx';
 import css from './ImageGallery.module.css';
 import PropTypes from 'prop-types';
 
-export default function ImageGallery({ images }) {
+export default function ImageGallery({ images, openModal }) {
     return (
         <section>
             <ul className={css.list}>
                 {images.map(({ id, description, urls }) => (
                     <li key={id}>
                         <ImageCard
+                            id={id}
                             preview={urls.small}
-                            original={urls.regular}
                             description={description}
+                            openModal={openModal}
                         />
                     </li>
                 ))}
@@ -26,7 +27,7 @@ ImageGallery.propTypes = {
         description: PropTypes.string,
         urls: PropTypes.shape({
             small: PropTypes.string,
-            regular: PropTypes.string
         }),
-    })).isRequired
+    })).isRequired,
+    openModal: PropTypes.func.isRequired
 };

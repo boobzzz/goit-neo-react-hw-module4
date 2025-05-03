@@ -1,16 +1,21 @@
 import css from './ImageCard.module.css';
 import PropTypes from 'prop-types';
 
-export default function ImageCard({ preview, original, description }) {
+export default function ImageCard({ id, preview, description, openModal }) {
+    const handleClick = () => {
+        openModal(id);
+    }
+
     return (
-        <div className={css.container}>
+        <div className={css.container} onClick={handleClick}>
             <img src={preview} alt={description} />
         </div>
     );
 }
 
 ImageCard.propTypes = {
+    id: PropTypes.string.isRequired,
     preview: PropTypes.string.isRequired,
-    original: PropTypes.string.isRequired,
-    description: PropTypes.string.isRequired
+    description: PropTypes.string.isRequired,
+    openModal: PropTypes.func.isRequired
 };

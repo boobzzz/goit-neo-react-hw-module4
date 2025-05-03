@@ -8,6 +8,7 @@ import ImageGallery from './components/ImageGallery.jsx';
 import LoadMoreBtn from './components/LoadMoreBtn.jsx';
 import Loader from './components/Loader.jsx';
 import ErrorMessage from './components/ErrorMessage.jsx';
+import ImageModal from './components/ImageModal.jsx';
 import Powered from './components/Powered.jsx';
 import './App.css';
 
@@ -17,6 +18,7 @@ function App() {
     const [page, setPage] = useState(0);
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState('');
+    const [modalImage, setModalImage] = useState(null);
 
     async function getImages(query, page) {
         try {
@@ -55,6 +57,15 @@ function App() {
         }
     }
 
+    const openModal = (id) => {
+        const image = images.find(image => image.id === id);
+        setModalImage(image);
+    }
+
+    const closeModal = () => {
+        setModalImage(null);
+    }
+
     useEffect(() => {
         if (page > 1) {
             autoScrollOnLoadMore();
@@ -67,7 +78,12 @@ function App() {
                 <SearchBox onSubmit={searchImages} />
             </header>
             <main>
-                {images?.length > 0 && <ImageGallery images={images} />}
+                {images?.length > 0 &&
+                    <ImageGallery
+                        images={images}
+                        openModal={openModal}
+                    />
+                }
                 {loading && <Loader />}
                 {error && <ErrorMessage message={error} />}
                 {images?.length > 0 && <LoadMoreBtn onClick={loadMore} />}
@@ -76,6 +92,11 @@ function App() {
                 <Powered />
             </footer>
             <Toaster/>
+            <ImageModal
+                isOpen={!!modalImage}
+                closeModal={closeModal}
+                image={modalImage}
+            />
         </>
     )
 }
